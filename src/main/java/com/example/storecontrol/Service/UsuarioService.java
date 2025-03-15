@@ -39,7 +39,14 @@ public class UsuarioService {
         usuarioRepository.deleteById(id);
     }
 
+    public boolean autenticarUsuario(String email, String senha) {
+        return usuarioRepository.findByEmail(email)
+                .map(usuario -> passwordEncoder.matches(senha, usuario.getSenha()))
+                .orElse(false);
+    }
+
     public Usuario buscarUsuarioPorEmail(String email) {
-        return usuarioRepository.findByEmail(email);
+        return usuarioRepository.findByEmail(email)
+                .orElseThrow(()-> new RuntimeException("Usuário não encontrado com o email: " + email));
     }
 }
