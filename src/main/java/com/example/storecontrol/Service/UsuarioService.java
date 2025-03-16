@@ -20,10 +20,13 @@ public class UsuarioService {
     }
 
     public Usuario registrarUsuario(RegistroUsuarioDTO registroUsuarioDTO) {
+        if (usuarioRepository.existsByEmail(registroUsuarioDTO.getEmail())) {
+            throw new RuntimeException("Email já cadastrado: " + registroUsuarioDTO.getEmail());
+        }
         Usuario usuario = new Usuario();
         usuario.setNome(registroUsuarioDTO.getNome());
         usuario.setEmail(registroUsuarioDTO.getEmail());
-        usuario.setSenha(passwordEncoder.encode(registroUsuarioDTO.getSenha())); // Criptografa a senha
+        usuario.setSenha(passwordEncoder.encode(registroUsuarioDTO.getSenha()));
         return usuarioRepository.save(usuario);
     }
 
@@ -35,7 +38,12 @@ public class UsuarioService {
         return usuarioRepository.findById(id);
     }
 
-    public void deletarUsuario(Long id) {
+    public void deletarUsuario(Long id, String emailUsuarioAutenticado) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado com o ID: " + id));
+        if (!usuario.getEmail().equals(emailUsuarioAutenticado)) {
+            throw new RuntimeException("Você não tem permissão para excluir esta conta.");
+        }
         usuarioRepository.deleteById(id);
     }
 

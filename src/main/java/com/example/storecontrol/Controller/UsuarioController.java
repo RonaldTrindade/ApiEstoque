@@ -4,12 +4,14 @@ import com.example.storecontrol.Dto.LoginDTO;
 import com.example.storecontrol.Dto.RegistroUsuarioDTO;
 import com.example.storecontrol.Dto.UsuarioDTO;
 import com.example.storecontrol.Model.Usuario;
+import com.example.storecontrol.Repository.UsuarioRepository;
 import com.example.storecontrol.Service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,16 +19,22 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/usuarios")
 public class UsuarioController {
     private final UsuarioService usuarioService;
-
-    public UsuarioController(UsuarioService usuarioService) {
+    private final UsuarioRepository usuarioRepository;
+    public UsuarioController(UsuarioService usuarioService, UsuarioRepository usuarioRepository) {
         this.usuarioService = usuarioService;
+        this.usuarioRepository = usuarioRepository;
     }
 
     @PostMapping("/registro")
-    public ResponseEntity<UsuarioDTO> registrarUsuario(@Valid @RequestBody RegistroUsuarioDTO registroUsuarioDTO) {
-        Usuario usuarioRegistrado = usuarioService.registrarUsuario(registroUsuarioDTO);
-        UsuarioDTO usuarioDTO = mapToUsuarioDTO(usuarioRegistrado);
-        return ResponseEntity.ok(usuarioDTO);
+    public ResponseEntity<?> registrarUsuario(@Valid @RequestBody RegistroUsuarioDTO registroUsuarioDTO) {
+        try {
+            Usuario usuarioRegistrado = usuarioService.registrarUsuario(registroUsuarioDTO);
+            UsuarioDTO usuarioDTO = mapToUsuarioDTO(usuarioRegistrado);
+            return ResponseEntity.ok(usuarioDTO);
+        } catch (RuntimeException e) {
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @PostMapping("/login")
@@ -45,6 +53,10 @@ public class UsuarioController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("Usuário não encontrado com o email: " + loginDTO.getEmail());
         }
+    }
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok("Logout realizado com sucesso.");
     }
 
     @GetMapping("/{id}")
@@ -65,8 +77,9 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletarUsuario(@PathVariable Long id) {
-        usuarioService.deletarUsuario(id);
+    public ResponseEntity<Void> deletarUsuario(@PathVariable Long id, Principal principal) {
+        String emailUsuarioAutenticado = principal.getName();
+        usuarioService.deletarUsuario(id, emailUsuarioAutenticado);
         return ResponseEntity.noContent().build();
     }
 
