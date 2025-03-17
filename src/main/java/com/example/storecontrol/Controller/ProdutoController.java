@@ -1,21 +1,18 @@
 package com.example.storecontrol.Controller;
 
 import com.example.storecontrol.Model.Produto;
-import com.example.storecontrol.Service.ProdutoService;
+import com.example.storecontrol.Service.impl.ProdutoServiceImpl;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/produtos")
 public class ProdutoController {
 
-    private final ProdutoService produtoService;
-
-    public ProdutoController(ProdutoService produtoService) {
-        this.produtoService = produtoService;
-    }
+    private final ProdutoServiceImpl produtoService;
 
     @PostMapping
     public ResponseEntity<Produto> salvarProduto(@RequestBody Produto produto) {

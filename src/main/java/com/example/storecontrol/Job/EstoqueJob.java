@@ -4,7 +4,7 @@ import com.example.storecontrol.Model.Estoque;
 import com.example.storecontrol.Model.Produto;
 import com.example.storecontrol.Model.Usuario;
 import com.example.storecontrol.Repository.EstoqueRepository;
-import com.example.storecontrol.Service.EmailService;
+import com.example.storecontrol.Service.impl.EmailService;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.util.List;

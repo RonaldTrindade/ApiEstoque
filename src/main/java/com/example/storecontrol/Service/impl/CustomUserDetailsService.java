@@ -1,4 +1,4 @@
-package com.example.storecontrol.Service;
+package com.example.storecontrol.Service.impl;
 
 import com.example.storecontrol.Model.Usuario;
 import com.example.storecontrol.Repository.UsuarioRepository;

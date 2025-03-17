@@ -5,25 +5,29 @@ import com.example.storecontrol.Dto.RegistroUsuarioDTO;
 import com.example.storecontrol.Dto.UsuarioDTO;
 import com.example.storecontrol.Model.Usuario;
 import com.example.storecontrol.Repository.UsuarioRepository;
-import com.example.storecontrol.Service.UsuarioService;
+import com.example.storecontrol.Service.impl.UsuarioServiceImpl;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/usuarios")
 public class UsuarioController {
-    private final UsuarioService usuarioService;
+    
+    private final UsuarioServiceImpl usuarioService;
     private final UsuarioRepository usuarioRepository;
-    public UsuarioController(UsuarioService usuarioService, UsuarioRepository usuarioRepository) {
-        this.usuarioService = usuarioService;
-        this.usuarioRepository = usuarioRepository;
-    }
+
 
     @PostMapping("/registro")
     public ResponseEntity<?> registrarUsuario(@Valid @RequestBody RegistroUsuarioDTO registroUsuarioDTO) {
@@ -54,9 +58,15 @@ public class UsuarioController {
                     .body("Usuário não encontrado com o email: " + loginDTO.getEmail());
         }
     }
+
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok("Logout realizado com sucesso.");
+    public ResponseEntity<String> logout(HttpServletRequest request, HttpServletResponse response) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            new SecurityContextLogoutHandler().logout(request, response, auth);
+            return ResponseEntity.ok("Logout realizado com sucesso.");
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Nenhum usuário autenticado.");
     }
 
     @GetMapping("/{id}")
@@ -76,10 +86,14 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarios);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletarUsuario(@PathVariable Long id, Principal principal) {
+    @DeleteMapping
+    public ResponseEntity<Void> deletarUsuario(Principal principal, HttpServletRequest request, HttpServletResponse response) {
         String emailUsuarioAutenticado = principal.getName();
-        usuarioService.deletarUsuario(id, emailUsuarioAutenticado);
+        usuarioService.deletarUsuario(emailUsuarioAutenticado);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null) {
+            new SecurityContextLogoutHandler().logout(request, response, auth);
+        }
         return ResponseEntity.noContent().build();
     }
 

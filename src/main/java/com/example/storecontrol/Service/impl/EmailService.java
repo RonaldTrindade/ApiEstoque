@@ -1,4 +1,4 @@
-package com.example.storecontrol.Service;
+package com.example.storecontrol.Service.impl;
 
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;

@@ -1,22 +1,18 @@
 package com.example.storecontrol.Controller;
 
 import com.example.storecontrol.Model.Perfil;
-import com.example.storecontrol.Service.PerfilService;
+import com.example.storecontrol.Service.impl.PerfilServiceImpl;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/perfis")
 public class PerfilController {
 
-    private final PerfilService perfilService;
-
-    public PerfilController(PerfilService perfilService) {
-        this.perfilService = perfilService;
-    }
-
+    private final PerfilServiceImpl perfilService;
     @PostMapping
     public ResponseEntity<Perfil> salvarPerfil(@RequestBody Perfil perfil) {
         Perfil perfilSalvo = perfilService.salvarPerfil(perfil);

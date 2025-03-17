@@ -2,21 +2,17 @@ package com.example.storecontrol.Controller;
 
 
 import com.example.storecontrol.Model.Estoque;
-import com.example.storecontrol.Service.EstoqueService;
+import com.example.storecontrol.Service.impl.EstoqueServiceImpl;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/estoques")
 public class EstoqueController {
-
-    private final EstoqueService estoqueService;
-
-    public EstoqueController(EstoqueService estoqueService) {
-        this.estoqueService = estoqueService;
-    }
+    private final EstoqueServiceImpl estoqueService;
 
     @PostMapping
     public ResponseEntity<Estoque> salvarEstoque(@RequestBody Estoque estoque) {

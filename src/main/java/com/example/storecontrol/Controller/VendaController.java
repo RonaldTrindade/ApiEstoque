@@ -2,20 +2,18 @@ package com.example.storecontrol.Controller;
 
 import com.example.storecontrol.Model.Venda;
 import com.example.storecontrol.Service.VendaService;
+import com.example.storecontrol.Service.impl.VendaServiceImpl;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/vendas")
 public class VendaController {
 
     private final VendaService vendaService;
-
-    public VendaController(VendaService vendaService) {
-        this.vendaService = vendaService;
-    }
 
     @PostMapping
     public ResponseEntity<Venda> salvarVenda(@RequestBody Venda venda) {
